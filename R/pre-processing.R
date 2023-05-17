@@ -7,10 +7,12 @@
 #'
 #' @param counts_filepath File path to the featurecounts output
 #' @param sample_name_regex Regex for sample names to rename the columns
-#' @param metadata Metadata file with sample information in tidy format. The "sample" column must
-#'    correspond to the "sample_name_regex"
+#' @param metadata Metadata file with sample information in tidy format. Columns should include
+#'    "sample" and "group" at minimum. "sample" column must correspond to "sample_name_regex",
+#'    and "group" column denotes the comparison groups i.e. stim or unstim.
 #' @param edger_min_count Corresponds to the edgeR `min.count` function
 #' @param export_normalised_data Should the normalised data be exported?
+#' @param exclude_samples Samples to be excluded. Based on metadata$sample column
 #'
 #' @examples \dontrun{
 #'   data <- pre_process_bulk(counts_filepath = "counts.txt",
@@ -34,7 +36,8 @@ pre_process_bulk <- function(counts_filepath = NULL,
                              pca_dims = c(5, 5),
                              export_gene_boxplots = TRUE,
                              boxplot_genes = NULL,
-                             boxplot_dims = c(4, 4)) {
+                             boxplot_dims = c(4, 4),
+                             exclude_samples = NULL) {
 
   ##---------- create output folders
 
@@ -61,6 +64,17 @@ pre_process_bulk <- function(counts_filepath = NULL,
   raw_data <- set_colnames(raw_data, str_extract(string = colnames(raw_data), pattern = sample_name_regex)) %>%
     janitor::clean_names() %>%
     select(metadata$sample)
+
+  ##---------- excluding samples
+
+  if (!is_null(exclude_samples)) {
+
+    cat("\n---------- Excluding samples")
+    cat("--- Samples to be excluded are: ", exclude_samples, sep = "\n")
+    raw_data <- select(raw_data, -c(exclude_samples))
+    metadata <- filter(metadata, sample %notin% exclude_samples)
+
+  }
 
   ##---------- edgeR processing
 
