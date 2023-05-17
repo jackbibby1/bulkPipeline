@@ -1,5 +1,5 @@
 setwd("~/My Drive/r_packages/bulkPipeline/")
-devtools::load_all()
+#devtools::load_all()
 
 setwd("~/Desktop/test_bulk/")
 

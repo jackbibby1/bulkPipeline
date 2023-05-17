@@ -11,7 +11,7 @@ pre_process_bulk(
   edger_min_count = 10,
   export_normalised_data = TRUE,
   export_pca = TRUE,
-  pca_dims = c(5, 5),
+  pca_dims = c(4.5, 4.5),
   export_gene_boxplots = TRUE,
   boxplot_genes = NULL,
   boxplot_dims = c(4, 4),
