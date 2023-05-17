@@ -31,6 +31,16 @@ and "group" column denotes the comparison groups i.e. stim or unstim.}
 
 \item{export_normalised_data}{Should the normalised data be exported?}
 
+\item{export_pca}{Should the PCA plot be exported?}
+
+\item{pca_dims}{Figure dimensions for the PCA plot}
+
+\item{export_gene_boxplots}{Should boxplots be produced for selected genes?}
+
+\item{boxplot_genes}{Which genes should be plotted?}
+
+\item{boxplot_dims}{Figure dimensions for the boxplot plot}
+
 \item{exclude_samples}{Samples to be excluded. Based on metadata$sample column}
 }
 \value{

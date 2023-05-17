@@ -12,6 +12,11 @@
 #'    and "group" column denotes the comparison groups i.e. stim or unstim.
 #' @param edger_min_count Corresponds to the edgeR `min.count` function
 #' @param export_normalised_data Should the normalised data be exported?
+#' @param export_pca Should the PCA plot be exported?
+#' @param pca_dims Figure dimensions for the PCA plot
+#' @param export_gene_boxplots Should boxplots be produced for selected genes?
+#' @param boxplot_genes Which genes should be plotted?
+#' @param boxplot_dims Figure dimensions for the boxplot plot
 #' @param exclude_samples Samples to be excluded. Based on metadata$sample column
 #'
 #' @examples \dontrun{
@@ -52,27 +57,27 @@ pre_process_bulk <- function(counts_filepath = NULL,
 
   cat("\n---------- Reading in data \n")
 
-  raw_data <- read.delim(counts_filepath, skip = 1) %>%
-    select(-c(Chr, Start, End, Strand, Length)) %>%
-    arrange(Geneid) %>%
-    column_to_rownames("Geneid")
+  raw_data <- utils::read.delim(counts_filepath, skip = 1) %>%
+    dplyr::select(-c(Chr, Start, End, Strand, Length)) %>%
+    dplyr::arrange(Geneid) %>%
+    tibble::column_to_rownames("Geneid")
 
   samples <- colnames(raw_data)
 
   cat("--- Samples in the counts file are: ", samples, sep = "\n")
 
-  raw_data <- set_colnames(raw_data, str_extract(string = colnames(raw_data), pattern = sample_name_regex)) %>%
+  raw_data <- magrittr::set_colnames(raw_data, stringr::str_extract(string = colnames(raw_data), pattern = sample_name_regex)) %>%
     janitor::clean_names() %>%
-    select(metadata$sample)
+    dplyr::select(metadata$sample)
 
   ##---------- excluding samples
 
-  if (!is_null(exclude_samples)) {
+  if (!is.null(exclude_samples)) {
 
     cat("\n---------- Excluding samples")
     cat("--- Samples to be excluded are: ", exclude_samples, sep = "\n")
-    raw_data <- select(raw_data, -c(all_of(exclude_samples)))
-    metadata <- filter(metadata, sample %notin% exclude_samples)
+    raw_data <- dplyr::select(raw_data, -c(dplyr::all_of(exclude_samples)))
+    metadata <- dplyr::filter(metadata, sample %notin% exclude_samples)
     warning("Metadata object has been updated internally, but not in the global environment. To update this, run:
 
             metadata <- filter(metadata, sample %notin% c(", paste0("\"", exclude_samples, "\"", collapse = ", "), "))")
@@ -84,22 +89,22 @@ pre_process_bulk <- function(counts_filepath = NULL,
   cat("\n---------- Creating edgeR object for filtering and normalisation \n")
 
   groups <- metadata$group
-  y <- DGEList(counts = raw_data, group = groups)
-  keep_genes <- filterByExpr(y, min.count = edger_min_count)
+  y <- edgeR::DGEList(counts = raw_data, group = groups)
+  keep_genes <- edgeR::filterByExpr(y, min.count = edger_min_count)
   cat("--- Filtering results: \n")
   cat(paste0("- Genes included = ", sum(keep_genes)))
   cat(paste0("\n- Genes excluded = ", length(keep_genes)-sum(keep_genes)), "\n")
 
   y <- y[keep_genes, , keep.lib.sizes = F]
 
-  y <- calcNormFactors(y)
-  norm_data <- cpm(y) %>% data.frame()
+  y <- edgeR::calcNormFactors(y)
+  norm_data <- edgeR::cpm(y) %>% data.frame()
 
   if (export_normalised_data == TRUE) {
-    norm_data <- set_colnames(norm_data, make.names(metadata$group, unique = T)) %>%
+    norm_data <- magrittr::set_colnames(norm_data, make.names(metadata$group, unique = T)) %>%
       data.frame() %>%
       janitor::clean_names()
-    write.csv(norm_data, "tmm_cpm_normalised_data.csv")
+    utils::write.csv(norm_data, "tmm_cpm_normalised_data.csv")
   }
 
   ##---------- plotting some qc
@@ -109,30 +114,30 @@ pre_process_bulk <- function(counts_filepath = NULL,
   cat("\n---------- Calculating and plotting expression distributions \n")
 
   p1 <- raw_data %>%
-    set_colnames(colnames(norm_data)) %>%
-    pivot_longer(cols = tidyselect::peek_vars(), names_to = "sample", values_to = "n") %>%
-    ggplot(aes(sample, log2(n+1))) +
-    geom_boxplot(fill = "gray90", lwd = 0.2) +
-    labs(title = "Raw data") +
-    theme(panel.background = element_blank(),
-          panel.border = element_rect(fill = NA),
-          axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1),
-          axis.title.x = element_blank())
+    magrittr::set_colnames(colnames(norm_data)) %>%
+    dplyr::pivot_longer(cols = tidyselect::peek_vars(), names_to = "sample", values_to = "n") %>%
+    ggplot2::ggplot(ggplot2::aes(sample, log2(n+1))) +
+    ggplot2::geom_boxplot(fill = "gray90", lwd = 0.2) +
+    ggplot2::labs(title = "Raw data") +
+    ggplot2::theme(panel.background = ggplot2::element_blank(),
+          panel.border = ggplot2::element_rect(fill = NA),
+          axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, vjust = 1),
+          axis.title.x = ggplot2::element_blank())
 
   # normalised data
 
   p2 <- norm_data %>%
-    pivot_longer(cols = tidyselect::peek_vars(), names_to = "sample", values_to = "n") %>%
-    ggplot(aes(sample, log2(n+1))) +
-    geom_boxplot(fill = "gray90", lwd = 0.2) +
-    labs(title = "TMM-CPM normalised data") +
-    theme(panel.background = element_blank(),
-          panel.border = element_rect(fill = NA),
-          axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1),
-          axis.title.x = element_blank())
+    dplyr::pivot_longer(cols = tidyselect::peek_vars(), names_to = "sample", values_to = "n") %>%
+    ggplot2::ggplot(ggplot2::aes(sample, log2(n+1))) +
+    ggplot2::geom_boxplot(fill = "gray90", lwd = 0.2) +
+    ggplot2::labs(title = "TMM-CPM normalised data") +
+    ggplot2::theme(panel.background = ggplot2::element_blank(),
+          panel.border = ggplot2::element_rect(fill = NA),
+          axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, vjust = 1),
+          axis.title.x = ggplot2::element_blank())
 
   patchwork::wrap_plots(p1, p2)
-  ggsave("output_figures/boxplot_distributions.png", width = 10, height = 3.5, dpi = 600)
+  ggplot2::ggsave("output_figures/boxplot_distributions.png", width = 10, height = 3.5, dpi = 600)
   cat("--- Gene expression distributions exported to output_figures/boxplot_distributions.png \n")
 
   ##---------- pca plotting
@@ -142,7 +147,7 @@ pre_process_bulk <- function(counts_filepath = NULL,
     cat("\n---------- Calculating and exporting PCA \n")
 
     ## run pca
-    pca_df <- prcomp(t(log2(norm_data + 1)))
+    pca_df <- stats::prcomp(t(log2(norm_data + 1)))
 
     ## get var
     var_data <- pca_df$sdev^2
@@ -152,32 +157,32 @@ pre_process_bulk <- function(counts_filepath = NULL,
     ## export pc var plot
     data.frame(var = var_data,
                pc = 1:length(var_data)) %>%
-      ggplot(aes(pc, var)) +
-      geom_col(fill = "gray90", col = "black", lwd = 0.2) +
-      labs(title = "PCA scree plot", x = "PC", y = "% variance explained") +
-      scale_x_continuous(breaks = seq(0, length(var_data), 2)) +
-      theme(panel.background = element_blank(),
-            panel.border = element_rect(fill = NA))
+      ggplot2::ggplot(ggplot2::aes(pc, var)) +
+      ggplot2::geom_col(fill = "gray90", col = "black", lwd = 0.2) +
+      ggplot2::labs(title = "PCA scree plot", x = "PC", y = "% variance explained") +
+      ggplot2::scale_x_continuous(breaks = seq(0, length(var_data), 2)) +
+      ggplot2::theme(panel.background = ggplot2::element_blank(),
+            panel.border = ggplot2::element_rect(fill = NA))
 
-    ggsave(filename = "output_figures/pca_scree_plot.png", width = 5, height = 3, dpi = 600)
+    ggplot2::ggsave(filename = "output_figures/pca_scree_plot.png", width = 5, height = 3, dpi = 600)
     cat("--- PCA scree plot exported to output_figures/pca_scree_plot.png \n")
 
     ## plot pca
     pca_df <- data.frame(pc1 = pca_df$x[, "PC1"],
                          pc2 = pca_df$x[, "PC2"]) %>%
-      mutate(group = metadata$group)
+      dplyr::mutate(group = metadata$group)
 
 
-    ggplot(pca_df, aes(pc1, pc2)) +
-      geom_point(shape = 21, size = 4, alpha = 0.8, aes(fill = group)) +
-      labs(x = paste0("PC1: ", var_data[1], "%"),
+    ggplot2::ggplot(pca_df, ggplot2::aes(pc1, pc2)) +
+      ggplot2::geom_point(shape = 21, size = 4, alpha = 0.8, ggplot2::aes(fill = group)) +
+      ggplot2::labs(x = paste0("PC1: ", var_data[1], "%"),
            y = paste0("PC2: ", var_data[2], "%")) +
-      theme(panel.background = element_blank(),
-            axis.line = element_line(),
-            legend.key = element_blank(),
+      ggplot2::theme(panel.background = ggplot2::element_blank(),
+            axis.line = ggplot2::element_line(),
+            legend.key = ggplot2::element_blank(),
             aspect.ratio = 1)
 
-    ggsave(filename = "output_figures/pca_plot.png", width = pca_dims[1], height = pca_dims[2], dpi = 600)
+    ggplot2::ggsave(filename = "output_figures/pca_plot.png", width = pca_dims[1], height = pca_dims[2], dpi = 600)
     cat("--- PCA plot exported to output_figures/pca_plot.png \n")
 
   }
@@ -192,26 +197,26 @@ pre_process_bulk <- function(counts_filepath = NULL,
     plots <- lapply(boxplot_genes, function(x) {
 
       norm_data %>%
-        pivot_longer(cols = tidyselect::peek_vars(), names_to = "sample", values_to = "expression") %>%
-        mutate(gene = rep(rownames(norm_data), each = ncol(norm_data)),
+        dplyr::pivot_longer(cols = tidyselect::peek_vars(), names_to = "sample", values_to = "expression") %>%
+        dplyr::mutate(gene = rep(rownames(norm_data), each = ncol(norm_data)),
                group = rep(metadata$group, times = nrow(norm_data))) %>%
-        filter(gene %in% x) %>%
-        ggplot(aes(group, expression)) +
-        geom_boxplot(outlier.shape = NA, alpha = 0.3, aes(fill = group)) +
-        geom_jitter(width = 0.3, shape = 21, size = 3, aes(fill = group), alpha = 0.8) +
-        scale_y_continuous(limits = c(0, NA)) +
-        labs(y = "TMM-CPM normalised expression", title = as.character(x)) +
-        theme(panel.background = element_blank(),
-              panel.border = element_rect(fill = NA),
+        dplyr::filter(gene %in% x) %>%
+        ggplot2::ggplot(ggplot2::aes(group, expression)) +
+        ggplot2::geom_boxplot(outlier.shape = NA, alpha = 0.3, ggplot2::aes(fill = group)) +
+        ggplot2::geom_jitter(width = 0.3, shape = 21, size = 3, ggplot2::aes(fill = group), alpha = 0.8) +
+        ggplot2::scale_y_continuous(limits = c(0, NA)) +
+        ggplot2::labs(y = "TMM-CPM normalised expression", title = as.character(x)) +
+        ggplot2::theme(panel.background = ggplot2::element_blank(),
+              panel.border = ggplot2::element_rect(fill = NA),
               legend.position = "none",
-              axis.title.x = element_blank(),
-              axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))
+              axis.title.x = ggplot2::element_blank(),
+              axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, vjust = 1))
 
     })
 
-    pdf("output_figures/boxplots.pdf", onefile = TRUE, width = boxplot_dims[1], height = boxplot_dims[2])
+    grDevices::pdf("output_figures/boxplots.pdf", onefile = TRUE, width = boxplot_dims[1], height = boxplot_dims[2])
     print(plots)
-    dev.off()
+    grDevices::dev.off()
 
     cat("--- Gene expression plots exported to output_figures/boxplots.pdf \n \n")
 
@@ -257,19 +262,19 @@ process_bulk <- function(edger_object = NULL,
   ## design matrix
 
   cat("\n---------- Creating the design matrix \n")
-  design <- model.matrix(~0 + metadata$group)
+  design <- stats::model.matrix(~0 + metadata$group)
   colnames(design) <- unique(metadata$group)
   cat("--- Design matrix to use: \n")
   print(design)
 
   ## estimate dispersion
   cat("--- Estimating dispersion \n")
-  y <- estimateDisp(edger_object, design)
+  y <- edgeR::estimateDisp(edger_object, design)
 
   cat("--- Saving BCV plot to output_figures/bcv_plot.png \n")
-  png("output_figures/bcv_plot.png", res = 600, width = 5, height = 5, units = "in")
-  plotBCV(y)
-  dev.off()
+  grDevices::png("output_figures/bcv_plot.png", res = 600, width = 5, height = 5, units = "in")
+  edgeR::plotBCV(y)
+  grDevices::dev.off()
 
   if (stats_test == "glmqlf") {
 
@@ -277,7 +282,7 @@ process_bulk <- function(edger_object = NULL,
 
     ## fit model
     cat("--- Fitting model \n")
-    fit <- glmQLFit(y, design)
+    fit <- edgeR::glmQLFit(y, design)
 
     ## decide contrasts
     cat("--- Contrast matrix to use: \n")
@@ -290,11 +295,11 @@ process_bulk <- function(edger_object = NULL,
     diff_ex <- lapply(colnames(contrast_matrix), function(x) {
 
       print(x)
-      glmQLFTest(fit, contrast = contrast_matrix[, x]) %>%
-        topTags(n = Inf) %>%
+      edgeR::glmQLFTest(fit, contrast = contrast_matrix[, x]) %>%
+        edgeR::topTags(n = Inf) %>%
         data.frame() %>%
-        mutate(comparison = x,
-               direction = case_when(FDR < 0.05 & logFC > 0.6 ~ "up",
+        dplyr::mutate(comparison = x,
+               direction = dplyr::case_when(FDR < 0.05 & logFC > 0.6 ~ "up",
                                      FDR < 0.05 & logFC < -0.6 ~ "down",
                                      FDR > 0.05 | abs(logFC) < 0.6 ~ "none"))
 
@@ -313,7 +318,7 @@ process_bulk <- function(edger_object = NULL,
       for (i in names(diff_ex)) {
 
         save_name <- gsub(pattern = " - ", replacement = "_vs_", x = i)
-        write.csv(diff_ex[[i]], file = paste0("differential_expression/", save_name, ".csv"))
+        utils::write.csv(diff_ex[[i]], file = paste0("differential_expression/", save_name, ".csv"))
 
       }
 

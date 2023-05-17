@@ -6,9 +6,19 @@ Author: Who wrote it
 Maintainer: The package maintainer <yourself@somewhere.net>
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 URL: https://github.com/jackbibby1/bulkPipeline
 BugReports: https://github.com/jackbibby1/bulkPipeline/issues
 RoxygenNote: 7.2.3
+Imports: 
+    dplyr,
+    edgeR,
+    ggplot2,
+    janitor,
+    magrittr,
+    patchwork,
+    stringr,
+    tibble,
+    tidyselect
