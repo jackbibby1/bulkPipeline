@@ -33,7 +33,7 @@ pre_process_bulk <- function(counts_filepath = NULL,
                              edger_min_count = 10,
                              export_normalised_data = TRUE,
                              export_pca = TRUE,
-                             pca_dims = c(5, 5),
+                             pca_dims = c(4.5, 4.5),
                              export_gene_boxplots = TRUE,
                              boxplot_genes = NULL,
                              boxplot_dims = c(4, 4),
@@ -71,8 +71,11 @@ pre_process_bulk <- function(counts_filepath = NULL,
 
     cat("\n---------- Excluding samples")
     cat("--- Samples to be excluded are: ", exclude_samples, sep = "\n")
-    raw_data <- select(raw_data, -c(exclude_samples))
+    raw_data <- select(raw_data, -c(all_of(exclude_samples)))
     metadata <- filter(metadata, sample %notin% exclude_samples)
+    warning("Metadata object has been updated internally, but not in the global environment. To update this, run:
+
+            metadata <- filter(metadata, sample %notin% c(", paste0("\"", exclude_samples, "\"", collapse = ", "), "))")
 
   }
 
@@ -196,6 +199,7 @@ pre_process_bulk <- function(counts_filepath = NULL,
         ggplot(aes(group, expression)) +
         geom_boxplot(outlier.shape = NA, alpha = 0.3, aes(fill = group)) +
         geom_jitter(width = 0.3, shape = 21, size = 3, aes(fill = group), alpha = 0.8) +
+        scale_y_continuous(limits = c(0, NA)) +
         labs(y = "TMM-CPM normalised expression", title = as.character(x)) +
         theme(panel.background = element_blank(),
               panel.border = element_rect(fill = NA),
@@ -209,9 +213,11 @@ pre_process_bulk <- function(counts_filepath = NULL,
     print(plots)
     dev.off()
 
-    cat("--- Gene expression plots exported to output_figures/boxplots.pdf")
+    cat("--- Gene expression plots exported to output_figures/boxplots.pdf \n \n")
 
   }
+
+  cat("...done \n \n")
 
   return(y)
 
@@ -298,7 +304,7 @@ process_bulk <- function(edger_object = NULL,
 
     if (export_degs == TRUE) {
 
-      cat("\n--- Exporting DEGs to differential_expression/x... \n")
+      cat("\n--- Exporting DEGs to the differential_expression directory \n")
 
       if ("./differential_expression" %notin% list.dirs()) {
         dir.create("differential_expression")
@@ -314,6 +320,10 @@ process_bulk <- function(edger_object = NULL,
     }
 
   }
+
+  cat("\n ... done")
+
+  return(y)
 
 }
 
