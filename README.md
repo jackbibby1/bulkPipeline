@@ -1,6 +1,7 @@
 # bulkPipeline
 
 - Pipeline for basic bulk RNA-seq analysis
+- Follows a general featureCounts > edgeR pipeline
 
 #### Installation:
 
