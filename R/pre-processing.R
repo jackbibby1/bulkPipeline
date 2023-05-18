@@ -1,9 +1,9 @@
 #' Read and process featurecounts data in edgeR
 #'
-#' This function takes an input from the featurecounts output,
+#' This function takes the input from featurecounts,
 #' cleans the expression file with better names, creates an edgeR object,
 #' filters the data based on min.count, performs TMM-CPM normalisation,
-#' and exports boxploits of the data distributions.
+#' and exports boxplots of the data distributions.
 #'
 #' @param counts_filepath File path to the featurecounts output
 #' @param sample_name_regex Unique identifier for the samples in the column names of the featureCounts
@@ -236,7 +236,7 @@ pre_process_bulk <- function(counts_filepath = NULL,
 
 #' Process and perform stats testing with edgeR
 #'
-#' This function takes an edgeR input (typically from `pre_process_bulk()`)
+#' This function takes an edgeR input (typically from `bulkPipeline::pre_process_bulk()`)
 #' creates the design matrix, estimates dispersion, and performs DE testing
 #'
 #' @param edger_object edgeR object with norm factors calculated
