@@ -37,7 +37,7 @@ setwd("path-to/wdir")
 metadata <- data.frame(sample = paste0("sample", 1:12), 
                        stimulation = rep(c("unstim", "stim"), each = 6),
                        disease_status = rep(c("healthy", "disease"), each = 3, times = 2)) %>%
-                mutate(group = paste(stimulation, disease_status, sep = "_"))
+  mutate(group = paste(stimulation, disease_status, sep = "_"))
 
 # pre-process data --------------------------------------------------------
 # returns an edgeR object containing cleaned up names, groups, and norm factors calculated
@@ -53,6 +53,7 @@ df <- pre_process_bulk(counts_filepath = "counts.txt",
                        boxplot_genes = c("CD3D", "IFNG", "MYC"))
 
 # create a contrast matrix for comparisons --------------------------------
+
 contrast_matrix <- makeContrasts(unstim_healthy-stim_healthy,
                                  unstim_disease-stim_disease,
                                  unstim_healthy-unstim_disease,
