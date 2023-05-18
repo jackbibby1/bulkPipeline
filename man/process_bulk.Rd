@@ -20,7 +20,7 @@ process_bulk(
 \item{stats_test}{What stats test to use. Currently only glmqlf}
 
 \item{contrast_matrix}{Contrast matrix for comparisons. Created with the `makeContrasts()`
-function}
+function. See https://github.com/jackbibby1/bulkPipeline for example}
 
 \item{export_degs}{Should differential expression testing results be exported?}
 }

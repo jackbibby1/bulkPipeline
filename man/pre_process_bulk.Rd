@@ -21,11 +21,16 @@ pre_process_bulk(
 \arguments{
 \item{counts_filepath}{File path to the featurecounts output}
 
-\item{sample_name_regex}{Regex for sample names to rename the columns}
+\item{sample_name_regex}{Unique identifier for the samples in the column names of the featureCounts
+output. Uses stringr::str_extract to pull the unique identifiers
+e.g. sample_name_regex for a counts.txt file with column names as fcounts_s1_output, fcounts_s2_output,
+fcounts_s3_output, fcounts_s4_output would be "s[1-4]". This renders the final column names as s1, s2, s3, s4.
+These final column names should match the metadata file.}
 
 \item{metadata}{Metadata file with sample information in tidy format. Columns should include
 "sample" and "group" at minimum. "sample" column must correspond to "sample_name_regex",
-and "group" column denotes the comparison groups i.e. stim or unstim.}
+and "group" column denotes the comparison groups i.e. stim or unstim. Group is also used to name the
+columns in the normalised output.}
 
 \item{edger_min_count}{Corresponds to the edgeR `min.count` function}
 
