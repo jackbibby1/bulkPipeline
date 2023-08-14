@@ -209,7 +209,7 @@ pre_process_bulk <- function(counts_filepath = NULL,
         dplyr::filter(gene %in% x) %>%
         ggplot2::ggplot(ggplot2::aes(group, expression)) +
         ggplot2::geom_boxplot(outlier.shape = NA, alpha = 0.3, ggplot2::aes(fill = group)) +
-        ggplot2::geom_jitter(width = 0.3, shape = 21, size = 3, ggplot2::aes(fill = group), alpha = 0.8) +
+        ggplot2::geom_jitter(width = 0.3, height = 0, shape = 21, size = 3, ggplot2::aes(fill = group), alpha = 0.8) +
         ggplot2::scale_y_continuous(limits = c(0, NA)) +
         ggplot2::labs(y = "TMM-CPM normalised expression", title = as.character(x)) +
         ggplot2::theme(panel.background = ggplot2::element_blank(),
