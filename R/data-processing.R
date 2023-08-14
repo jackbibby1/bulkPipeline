@@ -121,7 +121,7 @@ pre_process_bulk <- function(counts_filepath = NULL,
 
   p1 <- raw_data %>%
     magrittr::set_colnames(colnames(norm_data)) %>%
-    dplyr::pivot_longer(cols = tidyselect::peek_vars(), names_to = "sample", values_to = "n") %>%
+    tidyr::pivot_longer(cols = tidyselect::peek_vars(), names_to = "sample", values_to = "n") %>%
     ggplot2::ggplot(ggplot2::aes(sample, log2(n+1))) +
     ggplot2::geom_boxplot(fill = "gray90", lwd = 0.2) +
     ggplot2::labs(title = "Raw data") +
@@ -133,7 +133,7 @@ pre_process_bulk <- function(counts_filepath = NULL,
   # normalised data
 
   p2 <- norm_data %>%
-    dplyr::pivot_longer(cols = tidyselect::peek_vars(), names_to = "sample", values_to = "n") %>%
+    tidyr::pivot_longer(cols = tidyselect::peek_vars(), names_to = "sample", values_to = "n") %>%
     ggplot2::ggplot(ggplot2::aes(sample, log2(n+1))) +
     ggplot2::geom_boxplot(fill = "gray90", lwd = 0.2) +
     ggplot2::labs(title = "TMM-CPM normalised data") +
@@ -203,7 +203,7 @@ pre_process_bulk <- function(counts_filepath = NULL,
     plots <- lapply(boxplot_genes, function(x) {
 
       norm_data %>%
-        dplyr::pivot_longer(cols = tidyselect::peek_vars(), names_to = "sample", values_to = "expression") %>%
+        tidyr::pivot_longer(cols = tidyselect::peek_vars(), names_to = "sample", values_to = "expression") %>%
         dplyr::mutate(gene = rep(rownames(norm_data), each = ncol(norm_data)),
                group = rep(metadata$group, times = nrow(norm_data))) %>%
         dplyr::filter(gene %in% x) %>%
