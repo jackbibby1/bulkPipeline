@@ -38,7 +38,7 @@
 
 
 pre_process_bulk <- function(counts_filepath = NULL,
-                             sample_name_regex = "S[0-9]+",
+                             sample_name_regex = "s[0-9]+",
                              metadata = NULL,
                              edger_min_count = 10,
                              export_normalised_data = TRUE,
@@ -53,9 +53,10 @@ pre_process_bulk <- function(counts_filepath = NULL,
 
   `%notin%` <- Negate(`%in%`)
 
-  if ("./output_figures" %notin% list.dirs()) {
+  if ("r_output" %notin% list.dirs()) {
     cat("---------- Creating output_figures directory for output files \n")
-    dir.create("output_figures")
+    dir.create("r_output/output_figures", recursive = T)
+    dir.create("r_output/expression_data")
   }
 
   ##---------- read in data
@@ -110,7 +111,8 @@ pre_process_bulk <- function(counts_filepath = NULL,
     norm_data <- magrittr::set_colnames(norm_data, make.names(metadata$group, unique = T)) %>%
       data.frame() %>%
       janitor::clean_names()
-    utils::write.csv(norm_data, "tmm_cpm_normalised_data.csv")
+    utils::write.csv(norm_data, "r_output/expression_data/tmm_cpm_normalised_data.csv")
+    cat("--- Normalised data exported to r_output/expression_data/tmm_cpm_normalised_data.csv \n")
   }
 
   ##---------- plotting some qc
@@ -143,8 +145,8 @@ pre_process_bulk <- function(counts_filepath = NULL,
           axis.title.x = ggplot2::element_blank())
 
   patchwork::wrap_plots(p1, p2)
-  ggplot2::ggsave("output_figures/boxplot_distributions.png", width = 10, height = 3.5, dpi = 600)
-  cat("--- Gene expression distributions exported to output_figures/boxplot_distributions.png \n")
+  ggplot2::ggsave("r_output/output_figures/boxplot_distributions.png", width = 10, height = 3.5, dpi = 600)
+  cat("--- Gene expression distributions exported to r_output/output_figures/boxplot_distributions.png \n")
 
   ##---------- pca plotting
 
@@ -170,8 +172,8 @@ pre_process_bulk <- function(counts_filepath = NULL,
       ggplot2::theme(panel.background = ggplot2::element_blank(),
             panel.border = ggplot2::element_rect(fill = NA))
 
-    ggplot2::ggsave(filename = "output_figures/pca_scree_plot.png", width = 5, height = 3, dpi = 600)
-    cat("--- PCA scree plot exported to output_figures/pca_scree_plot.png \n")
+    ggplot2::ggsave(filename = "r_output/output_figures/pca_scree_plot.png", width = 5, height = 3, dpi = 600)
+    cat("--- PCA scree plot exported to r_output/output_figures/pca_scree_plot.png \n")
 
     ## plot pca
     pca_df <- data.frame(pc1 = pca_df$x[, "PC1"],
@@ -188,8 +190,8 @@ pre_process_bulk <- function(counts_filepath = NULL,
             legend.key = ggplot2::element_blank(),
             aspect.ratio = 1)
 
-    ggplot2::ggsave(filename = "output_figures/pca_plot.png", width = pca_dims[1], height = pca_dims[2], dpi = 600)
-    cat("--- PCA plot exported to output_figures/pca_plot.png \n")
+    ggplot2::ggsave(filename = "r_output/output_figures/pca_plot.png", width = pca_dims[1], height = pca_dims[2], dpi = 600)
+    cat("--- PCA plot exported to r_output/output_figures/pca_plot.png \n")
 
   }
 
@@ -220,11 +222,11 @@ pre_process_bulk <- function(counts_filepath = NULL,
 
     })
 
-    grDevices::pdf("output_figures/boxplots.pdf", onefile = TRUE, width = boxplot_dims[1], height = boxplot_dims[2])
+    grDevices::pdf("r_output/output_figures/boxplots.pdf", onefile = TRUE, width = boxplot_dims[1], height = boxplot_dims[2])
     print(plots)
     grDevices::dev.off()
 
-    cat("--- Gene expression plots exported to output_figures/boxplots.pdf \n \n")
+    cat("--- Gene expression plots exported to r_output/output_figures/boxplots.pdf \n \n")
 
   }
 
