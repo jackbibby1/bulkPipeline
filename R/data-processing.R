@@ -37,9 +37,9 @@
 #' @export
 
 
-pre_process_bulk <- function(counts_filepath = NULL,
+pre_process_bulk <- function(counts_filepath = "featurecounts/counts.txt",
                              sample_name_regex = "s[0-9]+",
-                             metadata = NULL,
+                             metadata = metadata,
                              edger_min_count = 10,
                              export_normalised_data = TRUE,
                              export_pca = TRUE,
