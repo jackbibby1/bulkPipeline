@@ -75,7 +75,7 @@ pre_process_bulk <- function(counts_filepath = "featurecounts/counts.txt",
   raw_data <- magrittr::set_colnames(raw_data, stringr::str_extract(string = colnames(raw_data),
                                                                     pattern = sample_name_regex)) %>%
     janitor::clean_names() %>%
-    dplyr::select(metadata$sample)
+    dplyr::select(tidyselect::all_of(metadata$sample))
 
   ##---------- excluding samples
 
