@@ -53,7 +53,7 @@ pre_process_bulk <- function(counts_filepath = "featurecounts/counts.txt",
 
   `%notin%` <- Negate(`%in%`)
 
-  if ("r_output" %notin% list.dirs()) {
+  if ("./r_output" %notin% list.dirs()) {
     cat("---------- Creating output_figures directory for output files \n")
     dir.create("r_output/output_figures", recursive = T)
     dir.create("r_output/expression_data")
@@ -75,7 +75,7 @@ pre_process_bulk <- function(counts_filepath = "featurecounts/counts.txt",
   raw_data <- magrittr::set_colnames(raw_data, stringr::str_extract(string = colnames(raw_data),
                                                                     pattern = sample_name_regex)) %>%
     janitor::clean_names() %>%
-    dplyr::select(tidyselect::all_of(metadata$sample))
+    dplyr::select(metadata$sample)
 
   ##---------- excluding samples
 
