@@ -39,7 +39,7 @@
 
 pre_process_bulk <- function(counts_filepath = "featurecounts/counts.txt",
                              sample_name_regex = "s[0-9]+",
-                             metadata = metadata,
+                             metadata = NULL,
                              edger_min_count = 10,
                              export_normalised_data = TRUE,
                              export_pca = TRUE,
@@ -49,15 +49,15 @@ pre_process_bulk <- function(counts_filepath = "featurecounts/counts.txt",
                              boxplot_dims = c(4, 4),
                              exclude_samples = NULL) {
 
-  ##---------- create output folders
+  ##---------- define notin function
 
   `%notin%` <- Negate(`%in%`)
 
-  if ("./r_output" %notin% list.dirs()) {
-    cat("---------- Creating output_figures directory for output files \n")
-    dir.create("r_output/output_figures", recursive = T)
-    dir.create("r_output/expression_data")
-  }
+  ##---------- create output folders
+
+  cat("---------- Creating output_figures directory for output files \n")
+  dir.create("r_output/output_figures", recursive = T, showWarnings = F)
+  dir.create("r_output/expression_data", showWarnings = F)
 
   ##---------- read in data
 
