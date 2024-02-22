@@ -70,6 +70,8 @@ pre_process_bulk <- function(counts_filepath = "featurecounts/counts.txt",
 
   samples <- colnames(raw_data)
 
+  metadata <- read.csv("sample_metadata.csv")
+
   cat("--- Samples in the counts file are: ", samples, sep = "\n")
 
   raw_data <- magrittr::set_colnames(raw_data, stringr::str_extract(string = colnames(raw_data),
