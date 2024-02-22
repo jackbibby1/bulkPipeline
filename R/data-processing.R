@@ -279,8 +279,8 @@ process_bulk <- function(edger_object = NULL,
   cat("--- Estimating dispersion \n")
   y <- edgeR::estimateDisp(edger_object, design)
 
-  cat("--- Saving BCV plot to output_figures/bcv_plot.png \n")
-  grDevices::png("output_figures/bcv_plot.png", res = 600, width = 5, height = 5, units = "in")
+  cat("--- Saving BCV plot to r_output/output_figures/bcv_plot.png \n")
+  grDevices::png("r_output/output_figures/bcv_plot.png", res = 600, width = 5, height = 5, units = "in")
   edgeR::plotBCV(y)
   grDevices::dev.off()
 
@@ -319,14 +319,12 @@ process_bulk <- function(edger_object = NULL,
 
       cat("\n--- Exporting DEGs to the differential_expression directory \n")
 
-      if ("./differential_expression" %notin% list.dirs()) {
-        dir.create("differential_expression")
-      }
+        dir.create("r_output/differential_expression")
 
       for (i in names(diff_ex)) {
 
         save_name <- gsub(pattern = " - ", replacement = "_vs_", x = i)
-        utils::write.csv(diff_ex[[i]], file = paste0("differential_expression/", save_name, ".csv"))
+        utils::write.csv(diff_ex[[i]], file = paste0("r_output/differential_expression/", save_name, ".csv"))
 
       }
 
