@@ -55,7 +55,7 @@ pre_process_bulk <- function(counts_filepath = "featurecounts/counts.txt",
 
   ##---------- create output folders
 
-  cat("---------- Creating output_figures directory for output files \n")
+  cat("---------- Creating r_output directory for all output files \n")
   dir.create("r_output/output_figures", recursive = T, showWarnings = F)
   dir.create("r_output/expression_data", showWarnings = F)
 
