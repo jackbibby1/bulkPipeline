@@ -38,7 +38,7 @@
 
 
 pre_process_bulk <- function(counts_filepath = "featurecounts/counts.txt",
-                             sample_name_regex = "s[0-9]+",
+                             sample_name_regex = "s[0-9]+|SRR[0-9]+",
                              metadata = NULL,
                              edger_min_count = 10,
                              export_normalised_data = TRUE,
